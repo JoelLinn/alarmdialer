@@ -1,6 +1,6 @@
 <?php
-out("Installing Hotel Style Wake Up Calls");
-// list of the columns that need to be included in the hotelwakup table.  Add/subract values to this list and trigger a reinstall to alter the table
+out("Installing Alarm Dialer");
+// list of the columns that need to be included in the alarmdialer table.  Add/subract values to this list and trigger a reinstall to alter the table
 // this table is used to store module config info
 $cols['maxretries'] = "INT NOT NULL";
 $cols['waittime'] = "INT NOT NULL";
@@ -8,13 +8,11 @@ $cols['retrytime'] = "INT NOT NULL";
 $cols['extensionlength'] = "INT NOT NULL";
 $cols['cid'] = "VARCHAR(30)";
 $cols['cnam'] = "VARCHAR(30)";
-$cols['operator_mode'] = "INT NOT NULL";
-$cols['operator_extensions'] = "VARCHAR(30)";
 //new config table columns
 $cols['application'] = "VARCHAR(30)";
 $cols['data'] = "VARCHAR(30)";
 
-// list of columns that need to be in the hotelwakeup_calls table.  Add/subract values to this list and trigger a reinstall to alter the table
+// list of columns that need to be in the alarmdialer_calls table.  Add/subract values to this list and trigger a reinstall to alter the table
 // this table is used to store scheduled calls info
 $sc_cols['time'] = "INT NOT NULL";
 $sc_cols['ext'] = "INT NOT NULL";
@@ -31,8 +29,8 @@ $sc_cols['filename'] = "VARCHAR(100)";
 $sc_cols['frequency'] = "INT NOT NULL";
 
 
-// create the hotelwakeup table if it doesn't exist
-$sql = "CREATE TABLE IF NOT EXISTS hotelwakeup (";
+// create the alarmdialer table if it doesn't exist
+$sql = "CREATE TABLE IF NOT EXISTS alarmdialer (";
 foreach($cols as $key=>$val)
 {
 	$sql .= $key.' '.$val.', ';
@@ -41,11 +39,11 @@ $sql .= "PRIMARY KEY (maxretries))";
 $check = $db->query($sql);
 if (DB::IsError($check))
 {
-	die_freepbx( "Can not create hotelwakeup table: ".$sql." - ".$check->getMessage() .  "<br>");
+	die_freepbx( "Can not create alarmdialer table: ".$sql." - ".$check->getMessage() .  "<br>");
 }
 
-// create the hotelwakeup_calls table if it doesn't exist
-$sql = "CREATE TABLE IF NOT EXISTS hotelwakeup_calls (";
+// create the alarmdialer_calls table if it doesn't exist
+$sql = "CREATE TABLE IF NOT EXISTS alarmdialer_calls (";
 foreach($sc_cols as $key=>$val)
 {
 	$sql .= $key.' '.$val.', ';
@@ -54,12 +52,12 @@ $sql .= "PRIMARY KEY (time))";
 $check = $db->query($sql);
 if (DB::IsError($check))
 {
-	die_freepbx( "Can not create hotelwakeup_calls table: ".$sql." - ".$check->getMessage() .  "<br>");
+	die_freepbx( "Can not create alarmdialer_calls table: ".$sql." - ".$check->getMessage() .  "<br>");
 }
 
 //check status of exist columns in the hotelwakup table and change/drop as required
 $curret_cols = array();
-$sql = "DESC hotelwakeup";
+$sql = "DESC alarmdialer";
 $res = $db->query($sql);
 while($row = $res->fetchRow())
 {
@@ -67,7 +65,7 @@ while($row = $res->fetchRow())
 	{
 		$curret_cols[] = $row[0];
 		//make sure it has the latest definition
-		$sql = "ALTER TABLE hotelwakeup MODIFY ".$row[0]." ".$cols[$row[0]];
+		$sql = "ALTER TABLE alarmdialer MODIFY ".$row[0]." ".$cols[$row[0]];
 		$check = $db->query($sql);
 		if (DB::IsError($check))
 		{
@@ -77,7 +75,7 @@ while($row = $res->fetchRow())
 	else
 	{
 		//remove the column
-		$sql = "ALTER TABLE hotelwakeup DROP COLUMN ".$row[0];
+		$sql = "ALTER TABLE alarmdialer DROP COLUMN ".$row[0];
 		$check = $db->query($sql);
 		if(DB::IsError($check))
 		{
@@ -85,16 +83,16 @@ while($row = $res->fetchRow())
 		}
 		else
 		{
-			out('Removed no longer needed column '.$row[0].' from hotelwakup table.');
+			out('Removed no longer needed column '.$row[0].' from alarmdialer table.');
 		}
 	}
 }
-//add missing columns to the hotelwakeup table
+//add missing columns to the alarmdialer table
 foreach($cols as $key=>$val)
 {
 	if(!in_array($key,$curret_cols))
 	{
-		$sql = "ALTER TABLE hotelwakeup ADD ".$key." ".$val;
+		$sql = "ALTER TABLE alarmdialer ADD ".$key." ".$val;
 		$check = $db->query($sql);
 		if (DB::IsError($check))
 		{
@@ -102,14 +100,14 @@ foreach($cols as $key=>$val)
 		}
 		else
 		{
-			out('Added column '.$key.' to hotelwakeup table');
+			out('Added column '.$key.' to alarmdialer table');
 		}
 	}
 }
 
-//check status of exist columns in the hotelwakup_calls table and change/drop as required
+//check status of exist columns in the alarmdialer_calls table and change/drop as required
 $sc_curret_cols = array();
-$sql = "DESC hotelwakeup_calls";
+$sql = "DESC alarmdialer_calls";
 $res = $db->query($sql);
 while($row = $res->fetchRow())
 {
@@ -117,7 +115,7 @@ while($row = $res->fetchRow())
 	{
 		$sc_curret_cols[] = $row[0];
 		//make sure it has the latest definition
-		$sql = "ALTER TABLE hotelwakeup_calls MODIFY ".$row[0]." ".$sc_cols[$row[0]];
+		$sql = "ALTER TABLE alarmdialer_calls MODIFY ".$row[0]." ".$sc_cols[$row[0]];
 		$check = $db->query($sql);
 		if (DB::IsError($check))
 		{
@@ -127,7 +125,7 @@ while($row = $res->fetchRow())
 	else
 	{
 		//remove the column
-		$sql = "ALTER TABLE hotelwakeup_calls DROP COLUMN ".$row[0];
+		$sql = "ALTER TABLE alarmdialer_calls DROP COLUMN ".$row[0];
 		$check = $db->query($sql);
 		if(DB::IsError($check))
 		{
@@ -135,16 +133,16 @@ while($row = $res->fetchRow())
 		}
 		else
 		{
-			out('Removed no longer needed column '.$row[0].' from hotelwakeup_calls table');
+			out('Removed no longer needed column '.$row[0].' from alarmdialer_calls table');
 		}
 	}
 }
-//add missing columns to the hotelwakeup_calls table
+//add missing columns to the alarmdialer_calls table
 foreach($sc_cols as $key=>$val)
 {
 	if(!in_array($key,$sc_curret_cols))
 	{
-		$sql = "ALTER TABLE hotelwakeup_calls ADD ".$key." ".$val;
+		$sql = "ALTER TABLE alarmdialer_calls ADD ".$key." ".$val;
 		$check = $db->query($sql);
 		if (DB::IsError($check))
 		{
@@ -152,26 +150,26 @@ foreach($sc_cols as $key=>$val)
 		}
 		else
 		{
-			out('Added column '.$key.' to hotelwakeup_calls table');
+			out('Added column '.$key.' to alarmdialer_calls table');
 		}
 	}
 }
 
 //  Set default values - need mechanism to prevent overwriting existing values 
 out("Installing Default Values");
-$sql ="INSERT INTO hotelwakeup (maxretries, waittime, retrytime, cnam,             cid,    operator_mode, operator_extensions, extensionlength, application, data) ";
-$sql .= "               VALUES ('3',        '60',     '60',      'Wake Up Calls',  '*68',  '1',           '00 , 01',           '4',             'AGI',        'wakeconfirm.php')";
+$sql ="INSERT INTO alarmdialer (maxretries, waittime, retrytime, cnam,             cid,    extensionlength, application, data) ";
+$sql .= "               VALUES ('3',        '60',     '60',      'Alarm Dialer',  '*67',  '4',             'AGI',        'alarmconfirm.php')";
 
 $check = $db->query($sql);
 
 //  Removed the following check because it prevents install if the query above fails to overwrite existing values.
 //if (DB::IsError($check)) {
-//        die_freepbx( "Can not create default values in `hotelwakeup` table: " . $check->getMessage() .  "\n");
+//        die_freepbx( "Can not create default values in `alarmdialer` table: " . $check->getMessage() .  "\n");
 //}
 
-// Register FeatureCode - Hotel Wakeup;
-$fcc = new featurecode('hotelwakeup', 'hotelwakeup');
-$fcc->setDescription('Wake Up Calls');
-$fcc->setDefault('*68');
+// Register FeatureCode - Alarm Dialer;
+$fcc = new featurecode('alarmdialer', 'alarmdialer');
+$fcc->setDescription('Alarm Dialer');
+$fcc->setDefault('*67');
 $fcc->update();
 unset($fcc);

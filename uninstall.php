@@ -1,20 +1,20 @@
 <?php
-print "Hotel Style Wakeups are being uninstalled.<br>";
+print "Alarm Dialer is being uninstalled.<br>";
 
-// drop the hotelwakup table
-$sql = "DROP TABLE IF EXISTS hotelwakeup";
+// drop the alarmdialer table
+$sql = "DROP TABLE IF EXISTS alarmdialer";
 
 $check = $db->query($sql);
 if (DB::IsError($check)) {
-        die_freepbx( "Can not delete `hotelwakeup` table: " . $check->getMessage() .  "\n");
+        die_freepbx( "Can not delete `alarmdialer` table: " . $check->getMessage() .  "\n");
 }
 
-// drop the hotelwakup_calls table
-$sql = "DROP TABLE IF EXISTS hotelwakeup_calls";
+// drop the alarmdialer_calls table
+$sql = "DROP TABLE IF EXISTS alarmdialer_calls";
 
 $check = $db->query($sql);
 if (DB::IsError($check)) {
-        die_freepbx( "Can not delete `hotelwakeup_calls` table: " . $check->getMessage() .  "\n");
+        die_freepbx( "Can not delete `alarmdialer_calls` table: " . $check->getMessage() .  "\n");
 }
 
 // Consider adding code here to scan thru the spool/asterisk/outgoing directory and removing 
