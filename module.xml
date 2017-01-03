@@ -4,10 +4,10 @@
 	<version>0.1</version>
 	<license>GPLv2</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
-	<publisher>Sangoma Technologies Corporation</publisher>
+	<publisher>Linn</publisher>
 	<category>Applications</category>
 		<description>FreePBX module for generating alarm calls</description>
-	<info>https://github.com/POSSA/Hotel-Style-Wakeup-Calls</info>
+	<info>https://github.com/JoelLinn/alarmdialer</info>
 	<changelog>
 		 *0.1* First fork and modification of Wake Up Calls Module
 	</changelog>

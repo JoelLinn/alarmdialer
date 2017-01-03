@@ -1,11 +1,11 @@
 <div class="panel panel-info">
 	<div class="panel-heading">
 		<div class="panel-title">
-			<a href="#" data-toggle="collapse" data-target="#moreinfo" class="collapsed" aria-expanded="false"><i class="glyphicon glyphicon-info-sign"></i></a>&nbsp;&nbsp;&nbsp;<?php echo _('What is Hotel Style Wakeup Calls?')?></div>
+			<a href="#" data-toggle="collapse" data-target="#moreinfo" class="collapsed" aria-expanded="false"><i class="glyphicon glyphicon-info-sign"></i></a>&nbsp;&nbsp;&nbsp;<?php echo _('What is Alarm Dialer?')?></div>
 	</div>
 	<!--At some point we can probably kill this... Maybe make is a 1 time panel that may be dismissed-->
 	<div class="panel-body collapse" id="moreinfo" aria-expanded="false" style="height: 30px;">
-		<p><?php echo sprintf(_('Wake Up calls can be used to schedule a reminder or wakeup call to any valid destination. To schedule a call, dial %s or use the form below'),$code)?></p>
+		<p><?php echo sprintf(_('Alarm Dialer can be used to place calls until an alarm is marked as received. To create an Alarm, dial %s.'),$code)?></p>
 	</div>
 </div>
 <ul class="nav nav-tabs" role="tablist">
@@ -15,9 +15,6 @@
 <div class="tab-content display">
 	<div id="tab1" class="tab-pane active">
 		<div id="toolbar-all">
-			<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-				<i class="fa fa-plus"></i> <?php echo _('Add')?>
-			</button>
 			<button id="remove-all" class="btn btn-danger btn-remove" data-type="extensions" disabled data-section="all">
 				<i class="glyphicon glyphicon-remove"></i> <span><?php echo _('Delete')?></span>
 			</button>
@@ -26,7 +23,7 @@
 				<div id="servertime" data-time="<?php echo time()?>" data-zone="<?php echo date("e")?>" style="display: inline;"><span><?php echo _("Not received")?></span></div>
 			</span>
 		</div>
-		<table id="callgrid" data-url="ajax.php?module=hotelwakeup&amp;command=getable" data-cache="false" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped">
+		<table id="callgrid" data-url="ajax.php?module=alarmdialer&amp;command=getable" data-cache="false" data-toolbar="#toolbar-all" data-maintain-selected="true" data-show-columns="true" data-show-toggle="true" data-toggle="table" data-pagination="true" data-search="true" class="table table-striped">
 			<thead>
 				<tr>
 					<th data-field="time"><?php echo _("Time")?></th>
@@ -38,37 +35,8 @@
 		</table>
 	</div>
 	<div id="tab2" class="tab-pane">
-		<form class="fpbx-submit" action="?display=hotelwakeup" method="post">
+		<form class="fpbx-submit" action="?display=alarmdialer" method="post">
 			<input type="hidden" name="action" value="settings">
-			<div class="element-container">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
-								<div class="col-md-3">
-									<label class="control-label" for="operator_mode"><?php echo _('Operator Mode')?></label>
-									<i class="fa fa-question-circle fpbx-help-icon" data-for="operator_mode"></i>
-								</div>
-								<div class="col-md-9">
-									<span class="radioset">
-										<input id="operator_mode_yes" type="radio" value="1" name="operator_mode" <?php echo $config['operator_mode'] == "1" ? "checked" : ""?>>
-										<label for="operator_mode_yes"><?php echo _('Yes')?></label>
-										<input id="operator_mode_no" type="radio" value="0" name="operator_mode" <?php echo $config['operator_mode'] == "0" ? "checked" : ""?>>
-										<label for="operator_mode_no"><?php echo _('No')?></label>
-									</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<span id="operator_mode-help" class="help-block fpbx-help-block">
-							<?php echo _('When Operator Mode is enabled it will allow designated extentions to create wake up calls for any valid destination. If disabled calls can only be placed back to the caller ID of the user scheduling the wakeup call')?>
-						</span>
-					</div>
-				</div>
-			</div>
 			<div class="element-container">
 				<div class="row">
 					<div class="col-md-12">
@@ -89,30 +57,6 @@
 					<div class="col-md-12">
 						<span id="extensionlength-help" class="help-block fpbx-help-block">
 							<?php echo _('This controls the maximum number of digits an operator can send a wakeup call to. Set to 10 or 11 to allow wake up calls to outside numbers')?>
-						</span>
-					</div>
-				</div>
-			</div>
-			<div class="element-container">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="row">
-							<div class="form-group">
-								<div class="col-md-3">
-									<label class="control-label" for="operator_extensions"><?php echo _('Operator Extensions')?></label>
-									<i class="fa fa-question-circle fpbx-help-icon" data-for="operator_extensions"></i>
-								</div>
-								<div class="col-md-9">
-									<textarea class="form-control autosize" name="operator_extensions" id="operator_extensions"><?php echo implode("\n",$config['operator_extensions'])?></textarea>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<span id="operator_extensions-help" class="help-block fpbx-help-block">
-							<?php echo _('Enter the Caller IDs of each telephone you wish to be recognized as an "Operator".  Operator extensions are allowed to create wakeup calls for any valid destination. Numbers can be extension numbers, full caller ID numbers or Asterisk dialing patterns')?>
 						</span>
 					</div>
 				</div>
@@ -209,6 +153,29 @@
 					<div class="col-md-12">
 						<span id="callerid-help" class="help-block fpbx-help-block">
 							<?php echo _('CallerID for Wake Up Calls<br><br>Format: <b>&lt;#######&gt;</b>. You can also use the format: "hidden" <b>&lt;#######&gt;</b> to hide the CallerID sent out over Digital lines if supported (E1/T1/J1/BRI/SIP/IAX)')?></span>
+					</div>
+				</div>
+			</div>
+			<div class="element-container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="row">
+							<div class="form-group">
+								<div class="col-md-3">
+									<label class="control-label" for="destination"><?php echo _('Call Destination')?></label>
+									<i class="fa fa-question-circle fpbx-help-icon" data-for="destination"></i>
+								</div>
+								<div class="col-md-9">
+									<input class="form-control" type="text" name="destination" id="destination" value="<?php echo $config['destination']?>">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<span id="destination-help" class="help-block fpbx-help-block">
+							<?php echo _('Destination for Alarm Calls')?></span>
 					</div>
 				</div>
 			</div>

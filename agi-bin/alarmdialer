@@ -22,7 +22,7 @@ usleep(500);
 $cid = $AGI->parse_callerid();
 
 //TODO: needs to use AMPUSER through macro-caller-id
-alarmMenu($AGI, $cid['username']);
+alarmMenu($AGI, $config['destination']);
 
 /**
  * The Alarm Administration Menu
@@ -30,19 +30,19 @@ alarmMenu($AGI, $cid['username']);
  * @param  string $number The "number" to work with
  */
 function alarmMenu($AGI, $number) {
-	sim_playback($AGI,"an-error-has-occurred");
+	alarmAdd($AGI, $number);
 	$AGI->hangup();
 }
 
-
 /**
- * Simulate playback functionality like the dialplan
- * @param  object $AGI  The AGI Object
- * @param  string $file Audio files combined by/with '&'
+ * Add a alarm menu
+ * @param  object $AGI    The AGI object
+ * @param  string $number The "number" to work with
  */
-function sim_playback($AGI, $file) {
-	$files = explode('&',$file);
-	foreach($files as $f) {
-		$AGI->stream_file($f);
-	}
+function alarmAdd($AGI, $number) {
+	$lang = $AGI->request['agi_language'];
+
+	$time_wakeup = time() + 5; // 5 seconds delay
+
+	FreePBX::Alarmdialer()->addAlarm($number,$time_wakeup,$lang);
 }

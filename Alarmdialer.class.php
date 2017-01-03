@@ -90,7 +90,7 @@ class Alarmdialer implements \BMO {
 
 	public function addAlarm($destination, $time, $lang) {
 		$date = $this->getConfig();  // module config provided by user
-		$this->generateCallFile(array(
+		return $this->generateCallFile(array(
 			"time"  => $time,
 			"date" => 'unused',
 			"ext" => $destination,
@@ -106,7 +106,7 @@ class Alarmdialer implements \BMO {
 
 	public function showPage() {
 		if(!empty($_REQUEST['action']) && $_REQUEST['action'] == "delete" && !empty($_REQUEST['id']) && !empty($_REQUEST['ext'])) {
-			$file = $this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/wuc.".$_REQUEST['id'].".ext.".$_REQUEST['ext'].".call";
+			$file = $this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarm.".$_REQUEST['id'].".ext.".$_REQUEST['ext'].".call";
 			if(file_exists($file)) {
 				unlink($file);
 			}
@@ -123,7 +123,8 @@ class Alarmdialer implements \BMO {
 					"retrytime" => $_POST['retrytime'],
 					"maxretries" => $_POST['maxretries'],
 					"cid" => !empty($matches[2]) ? $matches[2] : $code,
-					"cnam" => !empty($matches[1]) ? $matches[1] : _("Alarm Dialer")
+					"cnam" => !empty($matches[1]) ? $matches[1] : _("Alarm Dialer"),
+					"destination" => $_POST['destination']
 				));
 			break;
 		}
@@ -144,9 +145,9 @@ class Alarmdialer implements \BMO {
 		if(empty($options)) {
 			return false;
 		}
-		$sql = "UPDATE `alarmdialer` SET `maxretries` = ?, `waittime` = ?, `retrytime` = ?, `extensionlength` = ?, `cnam` = ?, `cid` = ? LIMIT 1";
+		$sql = "UPDATE `alarmdialer` SET `maxretries` = ?, `waittime` = ?, `retrytime` = ?, `extensionlength` = ?, `cnam` = ?, `cid` = ?, `destination`= ? LIMIT 1";
 		$sth = $this->db->prepare($sql);
-		return $sth->execute(array($options['maxretries'], $options['waittime'], $options['retrytime'], $options['extensionlength'], $options['cnam'], $options['cid']));
+		return $sth->execute(array($options['maxretries'], $options['waittime'], $options['retrytime'], $options['extensionlength'], $options['cnam'], $options['cid'], $options['destination']));
 	}
 
 	public function CheckAlarmProp($file) {
@@ -227,10 +228,13 @@ class Alarmdialer implements \BMO {
 		fputs( $wuc, 'set: CHANNEL(language)='.$foo['language']."\n");
 		fputs( $wuc, "application: ".$foo['application']."\n");
 		fputs( $wuc, "data: ".$foo['data']."\n");
+		fputs( $wuc, "archive: yes\n");
 		fclose( $wuc );
 
 		// set time of temp file and move to outgoing
 		touch( $tempfile, $foo['time'], $foo['time'] );
 		rename( $tempfile, $outfile );
+
+		return $outfile;
 	}
 }

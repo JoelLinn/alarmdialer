@@ -1,4 +1,4 @@
-<h1>Hotel Style Wakeup Calls</h1>
+<h1>Alarm Dialer</h1>
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-sm-12">

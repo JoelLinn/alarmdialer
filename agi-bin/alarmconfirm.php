@@ -16,20 +16,17 @@ error_reporting(0);
 //
 require_once "phpagi.php";
 $AGI = new AGI();
-$AGI->answer();
+
 $lang = $AGI->request['agi_language'];
-if($lang == 'ja') {
-	sim_playback($AGI, "this-is-yr-wakeup-call");
-} else {
-	sim_playback($AGI, "hello&this-is-yr-wakeup-call");
-}
-$time_wakeup = time();
-if($lang == 'ja') {
-	$digit = sim_background($AGI, "wakeup-menu","1",1);
-} else { // Default back to English if channel doesn't match other languages
-	$digit = sim_background($AGI, "to-cancel-wakeup&press-1","1",1);
-}
 $number = $AGI->request['agi_extension'];
+$nextcallfile = FreePBX::Alarmdialer()->addAlarm($number,time() + 25,$lang); // shedule now to be save
+
+$AGI->answer();
+if($lang == 'ja') {
+	$digit = sim_background($AGI, "this-is-yr-wakeup-call&wakeup-menu","1",1);
+} else { // Default back to English if channel doesn't match other languages
+	$digit = sim_background($AGI, "hello&this-is-yr-wakeup-call&to-cancel-wakeup&vm-press&digits/1","1",1);
+}
 switch($digit) {
 	case 1:
 		if($lang == 'ja') {
@@ -37,16 +34,7 @@ switch($digit) {
 		} else {
 			sim_playback($AGI, "wakeup-call-cancelled");
 		}
-	break;
-	default:
-		$time_wakeup += 60;
-		if($lang == 'ja') {
-			sim_playback($AGI, "1-minutes-from-now&rqsted-wakeup-for");
-		} else {
-			sim_playback($AGI, "rqsted-wakeup-for&digits/1&minutes&vm-from&now");
-		}
-		FreePBX::Alarmdialer()->addAlarm($number,$time_wakeup,$lang);
-		$AGI->hangup();
+		FreePBX::Alarmdialer()->removeAlarm($nextcallfile);
 	break;
 }
 sim_playback($AGI, "goodbye");
@@ -75,7 +63,7 @@ function sim_playback($AGI, $file) {
  * @param  integer $maxLoops Max timeout loops
  * @param  integer $loops    Total loops
  */
-function sim_background($AGI, $file,$digits='',$length='1',$escape='#',$timeout=15000, $maxLoops=1, $loops=0) {
+function sim_background($AGI, $file,$digits='',$length='1',$escape='#',$timeout=10000, $maxLoops=1, $loops=0) {
 	$files = explode('&',$file);
 	$number = '';
 	$lang = $AGI->request['agi_language'];

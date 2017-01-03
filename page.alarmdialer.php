@@ -200,6 +200,14 @@ echo "&lt;<input type=\"text\" name=\"calleridnumber\" size=\"5\" value=\"{$date
 ?>
     </td>
   </tr>
+  <tr>
+    <td width="155"><a href="javascript: return false;" class="info">Destination:<span>Destination for alarm calls.</span></a></td>
+    <td>
+<?php
+echo "<input type=\"text\" name=\"destination\" size=\"13\" value=\"{$date[destinatnion]}\" style=\"text-align: right\">\n";
+?>
+    </td>
+  </tr>
 </table>
 <small>*Some systems require quote marks around the textual caller ID. You may include the " " if needed by your system.</small>
 

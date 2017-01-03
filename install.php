@@ -8,6 +8,7 @@ $cols['retrytime'] = "INT NOT NULL";
 $cols['extensionlength'] = "INT NOT NULL";
 $cols['cid'] = "VARCHAR(30)";
 $cols['cnam'] = "VARCHAR(30)";
+$cols['destination'] = "VARCHAR(30)";
 //new config table columns
 $cols['application'] = "VARCHAR(30)";
 $cols['data'] = "VARCHAR(30)";
@@ -157,8 +158,8 @@ foreach($sc_cols as $key=>$val)
 
 //  Set default values - need mechanism to prevent overwriting existing values 
 out("Installing Default Values");
-$sql ="INSERT INTO alarmdialer (maxretries, waittime, retrytime, cnam,             cid,    extensionlength, application, data) ";
-$sql .= "               VALUES ('3',        '60',     '60',      'Alarm Dialer',  '*67',  '4',             'AGI',        'alarmconfirm.php')";
+$sql ="INSERT INTO alarmdialer (maxretries, waittime, retrytime, cnam,             cid,    destination, extensionlength, application, data) ";
+$sql .= "               VALUES ('1000',     '20',     '5',       'Alarm Dialer',   '*67',  '7777',      '4',             'AGI',       'alarmconfirm.php')";
 
 $check = $db->query($sql);
 
