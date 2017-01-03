@@ -7,7 +7,7 @@ namespace FreePBX\modules;
  * In getActionbar change extdisplay to align with whatever variable you use to decide if the page is in edit mode.
  *
  */
-class Hotelwakeup implements \BMO {
+class Alarmdialer implements \BMO {
 	public function __construct($freepbx = null) {
 		if ($freepbx == null) {
 			throw new Exception("Not given a FreePBX Object");
@@ -24,7 +24,7 @@ class Hotelwakeup implements \BMO {
 	public function getActionBar($request) {
 		$buttons = array();
 		switch($request['display']) {
-			case 'hotelwakeup':
+			case 'alarmdialer':
 				$buttons = array(
 					'reset' => array(
 						'name' => 'reset',
@@ -75,9 +75,9 @@ class Hotelwakeup implements \BMO {
 				// check for insufficient data
 				if ($badtime)  {
 					// abandon .call file creation and pop up a js alert to the user
-					return array("status" => false, "message" => sprintf(_("Cannot schedule the call the scheduled time is in the past. [Time now: %s] [Wakeup Time: %s]"),date(DATE_RFC2822,$time_now),date(DATE_RFC2822,$time_wakeup)));
+					return array("status" => false, "message" => sprintf(_("Cannot schedule the call the scheduled time is in the past. [Time now: %s] [Alarm Time: %s]"),date(DATE_RFC2822,$time_now),date(DATE_RFC2822,$time_wakeup)));
 				} else {
-					$this->addWakeup($_POST['destination'],$time_wakeup,$lang);
+					$this->addAlarm($_POST['destination'],$time_wakeup,$lang);
 					return array("status" => true);
 				}
 			break;
@@ -88,7 +88,7 @@ class Hotelwakeup implements \BMO {
 		return true;
 	}
 
-	public function addWakeup($destination, $time, $lang) {
+	public function addAlarm($destination, $time, $lang) {
 		$date = $this->getConfig();  // module config provided by user
 		$this->generateCallFile(array(
 			"time"  => $time,
@@ -100,7 +100,7 @@ class Hotelwakeup implements \BMO {
 			"waittime" => $date['waittime'],
 			"callerid" => $date['cnam']." <".$date['cid'].">",
 			"application" => 'AGI',
-			"data" => 'wakeconfirm.php',
+			"data" => 'alarmconfirm.php',
 		));
 	}
 
@@ -112,20 +112,18 @@ class Hotelwakeup implements \BMO {
 			}
 		}
 		$action = !empty($_POST['action']) ? $_POST['action'] : '';
-		$fcc = new \featurecode('hotelwakeup', 'hotelwakeup');
+		$fcc = new \featurecode('alarmdialer', 'alarmdialer');
 		$code = $fcc->getCode();
 		switch($action) {
 			case "settings":
 				preg_match('/"(.*)" <(.*)>/',$_POST['callerid'],$matches);
 				$this->saveConfig(array(
-					"operator_mode" => $_POST['operator_mode'],
 					"extensionlength" => $_POST['extensionlength'],
-					"operator_extensions" => $_POST['operator_extensions'],
 					"waittime" => $_POST['waittime'],
 					"retrytime" => $_POST['retrytime'],
 					"maxretries" => $_POST['maxretries'],
 					"cid" => !empty($matches[2]) ? $matches[2] : $code,
-					"cnam" => !empty($matches[1]) ? $matches[1] : _("Wake Up Calls")
+					"cnam" => !empty($matches[1]) ? $matches[1] : _("Alarm Dialer")
 				));
 			break;
 		}
@@ -134,15 +132,11 @@ class Hotelwakeup implements \BMO {
 	}
 
 	public function getConfig() {
-		$sql = "SELECT * FROM hotelwakeup LIMIT 1";
+		$sql = "SELECT * FROM alarmdialer LIMIT 1";
 		$sth = $this->db->prepare($sql);
 		$sth->execute();
 		$fa = $sth->fetch(\PDO::FETCH_ASSOC);
 		$fa['callerid'] = '"'.$fa['cnam'].'" <'.$fa['cid'].'>';
-		$fa['operator_extensions'] = explode(",",$fa['operator_extensions']);
-		foreach($fa['operator_extensions'] as &$ext) {
-			$ext = trim($ext);
-		}
 		return $fa;
 	}
 
@@ -150,13 +144,12 @@ class Hotelwakeup implements \BMO {
 		if(empty($options)) {
 			return false;
 		}
-		$options['operator_extensions'] = str_replace("\n",",",$options['operator_extensions']);
-		$sql = "UPDATE `hotelwakeup` SET `maxretries` = ?, `waittime` = ?, `retrytime` = ?, `extensionlength` = ?, `cnam` = ?, `cid` = ?, `operator_mode` = ?, `operator_extensions` = ? LIMIT 1";
+		$sql = "UPDATE `alarmdialer` SET `maxretries` = ?, `waittime` = ?, `retrytime` = ?, `extensionlength` = ?, `cnam` = ?, `cid` = ? LIMIT 1";
 		$sth = $this->db->prepare($sql);
-		return $sth->execute(array($options['maxretries'], $options['waittime'], $options['retrytime'], $options['extensionlength'], $options['cnam'], $options['cid'], $options['operator_mode'], $options['operator_extensions']));
+		return $sth->execute(array($options['maxretries'], $options['waittime'], $options['retrytime'], $options['extensionlength'], $options['cnam'], $options['cid']));
 	}
 
-	public function CheckWakeUpProp($file) {
+	public function CheckAlarmProp($file) {
 		$myresult = '';
 		$file = basename($file);
 		$WakeUpTmp = explode(".", $file);
@@ -168,7 +161,7 @@ class Hotelwakeup implements \BMO {
 		return $myresult;
 	}
 
-	public function removeWakeup($file) {
+	public function removeAlarm($file) {
 		$file = basename($file);
 		if(file_exists($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/".$file)) {
 			unlink($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/".$file);
@@ -178,8 +171,8 @@ class Hotelwakeup implements \BMO {
 
 	public function getAllCalls() {
 		$calls = array();
-		foreach(glob($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/wuc*.call") as $file) {
-			$res = $this->CheckWakeUpProp($file);
+		foreach(glob($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarm*.call") as $file) {
+			$res = $this->CheckAlarmProp($file);
 			if(!empty($res)) {
 				$filedate = date('M d Y',filemtime($file)); //create a date string to display from the file timestamp
 				$filetime = date('H:i',filemtime($file));   //create a time string to display from the file timestamp
@@ -190,7 +183,7 @@ class Hotelwakeup implements \BMO {
 					"time" => $filetime,
 					"date" => $filedate,
 					"destination" => $wucext,
-					"actions" => '<a href="?display=hotelwakeup&amp;action=delete&amp;id='.$res[0].'&amp;ext='.$res[1].'"><i class="fa fa-times"></i></a>'
+					"actions" => '<a href="?display=alarmdialer&amp;action=delete&amp;id='.$res[0].'&amp;ext='.$res[1].'"><i class="fa fa-times"></i></a>'
 				);
 			}
 		}
@@ -211,7 +204,7 @@ class Hotelwakeup implements \BMO {
 
 		$foo['ext'] = preg_replace("/[^\d@\+\#]/","",$foo['ext']);
 		if (empty($foo['filename'])) {
-			$foo['filename'] = "wuc.".$foo['time'].".ext.".$foo['ext'].".call";
+			$foo['filename'] = "alarm.".$foo['time'].".ext.".$foo['ext'].".call";
 		}
 
 		$foo['filename'] = basename($foo['filename']);

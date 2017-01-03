@@ -25,9 +25,9 @@ if($lang == 'ja') {
 }
 $time_wakeup = time();
 if($lang == 'ja') {
-	$digit = sim_background($AGI, "wakeup-menu","1234",1);
+	$digit = sim_background($AGI, "wakeup-menu","1",1);
 } else { // Default back to English if channel doesn't match other languages
-	$digit = sim_background($AGI, "to-cancel-wakeup&press-1&to-snooze-for&digits/5&minutes&press-2&to-snooze-for&digits/10&minutes&press-3&to-snooze-for&digits/15&minutes&press-4","1234",1);
+	$digit = sim_background($AGI, "to-cancel-wakeup&press-1","1",1);
 }
 $number = $AGI->request['agi_extension'];
 switch($digit) {
@@ -38,34 +38,14 @@ switch($digit) {
 			sim_playback($AGI, "wakeup-call-cancelled");
 		}
 	break;
-	case 2:
-		$time_wakeup += 300;
+	default:
+		$time_wakeup += 60;
 		if($lang == 'ja') {
-			sim_playback($AGI, "5-minutes-from-now&rqsted-wakeup-for");
+			sim_playback($AGI, "1-minutes-from-now&rqsted-wakeup-for");
 		} else {
-			sim_playback($AGI, "rqsted-wakeup-for&digits/5&minutes&vm-from&now");
+			sim_playback($AGI, "rqsted-wakeup-for&digits/1&minutes&vm-from&now");
 		}
-		FreePBX::Hotelwakeup()->addWakeup($number,$time_wakeup,$lang);
-		$AGI->hangup();
-	break;
-	case 3:
-		$time_wakeup += 600;
-		if($lang == 'ja') {
-			sim_playback($AGI, "10-minutes-from-now&rqsted-wakeup-for");
-		} else {
-			sim_playback($AGI, "rqsted-wakeup-for&digits/10&minutes&vm-from&now");
-		}
-		FreePBX::Hotelwakeup()->addWakeup($number,$time_wakeup,$lang);
-		$AGI->hangup();
-	break;
-	case 4:
-		$time_wakeup += 900;
-		if($lang == 'ja') {
-			sim_playback($AGI, "15-minutes-from-now&rqsted-wakeup-for");
-		} else {
-			sim_playback($AGI, "rqsted-wakeup-for&digits/15&minutes&vm-from&now");
-		}
-		FreePBX::Hotelwakeup()->addWakeup($number,$time_wakeup,$lang);
+		FreePBX::Alarmdialer()->addAlarm($number,$time_wakeup,$lang);
 		$AGI->hangup();
 	break;
 }

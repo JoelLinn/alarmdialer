@@ -1,8 +1,8 @@
 <?php
 
 // this function required to make the feature code work
-function hotelwakeup_get_config($engine) {
-	$modulename = 'hotelwakeup';
+function alarmdialer_get_config($engine) {
+	$modulename = 'alarmdialer';
 
 	// This generates the dialplan
 	global $ext;
@@ -31,16 +31,16 @@ function hotelwakeup_get_config($engine) {
 }
 
 // this function required to make the feature code work
-function hotelwakeup_hotelwakeup($c) {
+function alarmdialer_alarmdialer($c) {
 	global $ext;
 	global $asterisk_conf;
 
-	$id = "app-hotelwakeup"; // The context to be included
+	$id = "app-alarmdialer"; // The context to be included
 
 	$ext->addInclude('from-internal-additional', $id); // Add the include from from-internal
 	$ext->add($id, $c, '', new ext_Macro('user-callerid'));
 	$ext->add($id, $c, '', new ext_answer(''));
 	$ext->add($id, $c, '', new ext_wait(1));
-	$ext->add($id, $c, '', new ext_AGI('wakeup'));
+	$ext->add($id, $c, '', new ext_AGI('alarmdialer'));
 	$ext->add($id, $c, '', new ext_Hangup);
 }

@@ -34,7 +34,7 @@ $(function() {
 
 
 		$("#savecall").prop("disabled",true);
-		$.post( "ajax.php", {command: "savecall", module: "hotelwakeup", destination: $("#destination").val(), time: $("#time").val(), day: $("#day").val()}, function( data ) {
+		$.post( "ajax.php", {command: "savecall", module: "alarmdialer", destination: $("#destination").val(), time: $("#time").val(), day: $("#day").val()}, function( data ) {
 			if(!data.status) {
 				alert(data.message);
 			} else {
