@@ -19,7 +19,7 @@ $AGI = new AGI();
 
 $lang = $AGI->request['agi_language'];
 $number = $AGI->request['agi_extension'];
-$nextcallfile = FreePBX::Alarmdialer()->addAlarm($number,time() + 25,$lang); // shedule now to be save
+$nextcallfile = FreePBX::Alarmdialer()->addAlarm($number,time() + 60,$lang); // shedule now to be save
 
 $AGI->answer();
 if($lang == 'ja') {
@@ -29,12 +29,12 @@ if($lang == 'ja') {
 }
 switch($digit) {
 	case 1:
+		FreePBX::Alarmdialer()->removeAlarm($nextcallfile);
 		if($lang == 'ja') {
 			sim_playback($AGI, "wakeup-call-cancelled");
 		} else {
 			sim_playback($AGI, "wakeup-call-cancelled");
 		}
-		FreePBX::Alarmdialer()->removeAlarm($nextcallfile);
 	break;
 }
 sim_playback($AGI, "goodbye");
