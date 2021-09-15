@@ -106,7 +106,7 @@ class Alarmdialer implements \BMO {
 
 	public function showPage() {
 		if(!empty($_REQUEST['action']) && $_REQUEST['action'] == "delete" && !empty($_REQUEST['id']) && !empty($_REQUEST['ext'])) {
-			$file = $this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarm.".$_REQUEST['id'].".ext.".$_REQUEST['ext'].".call";
+			$file = $this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarmdialer.".$_REQUEST['id'].".ext.".$_REQUEST['ext'].".call";
 			if(file_exists($file)) {
 				unlink($file);
 			}
@@ -172,7 +172,7 @@ class Alarmdialer implements \BMO {
 
 	public function getAllCalls() {
 		$calls = array();
-		foreach(glob($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarm*.call") as $file) {
+		foreach(glob($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarmdialer*.call") as $file) {
 			$res = $this->CheckAlarmProp($file);
 			if(!empty($res)) {
 				$filedate = date('M d Y',filemtime($file)); //create a date string to display from the file timestamp
@@ -205,7 +205,7 @@ class Alarmdialer implements \BMO {
 
 		$foo['ext'] = preg_replace("/[^\d@\+\#]/","",$foo['ext']);
 		if (empty($foo['filename'])) {
-			$foo['filename'] = "alarm.".$foo['time'].".ext.".$foo['ext'].".call";
+			$foo['filename'] = "alarmdialer.".$foo['time'].".ext.".$foo['ext'].".call";
 		}
 
 		$foo['filename'] = basename($foo['filename']);
@@ -213,9 +213,9 @@ class Alarmdialer implements \BMO {
 		$tempfile = $foo['tempdir'].$foo['filename'];
 		$outfile = $foo['outdir'].$foo['filename'];
 
-		// Delete any old .call file with the same name as the one we are creating.
-		if(file_exists($outfile) ) {
-			unlink($outfile);
+		// Delete any old alarmdialer .call file
+		foreach(glob($this->FreePBX->Config->get('ASTSPOOLDIR')."/outgoing/alarmdialer*.call") as $file) {
+			unlink($file);
 		}
 
 		// Create up a .call file, write and close

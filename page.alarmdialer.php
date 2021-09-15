@@ -129,7 +129,7 @@ echo "<TD>Time</TD><TD>Date</TD><TD>Destination</TD><TD>Delete</TD></TR>\n" ;
 
 // check spool directory and create a table listing all .call files created by this module
 $count = 0;
-$files = glob("/var/spool/asterisk/outgoing/alarm*.call");
+$files = glob("/var/spool/asterisk/outgoing/alarmdialer*.call");
 foreach($files as $file) {
 	$myresult = CheckWakeUpProp($file);
 	$filedate = date(M,filemtime($file))." ".date(d,filemtime($file))." ".date(Y,filemtime($file))  ; //create a date string to display from the file timestamp

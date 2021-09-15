@@ -1,7 +1,7 @@
 <module>
 	<rawname>alarmdialer</rawname>
 	<name>Alarm Dialer</name>
-	<version>0.2</version>
+	<version>0.3</version>
 	<license>GPLv2</license>
 	<licenselink>http://www.gnu.org/licenses/gpl-2.0.txt</licenselink>
 	<publisher>Linn</publisher>
@@ -9,6 +9,7 @@
 		<description>FreePBX module for generating alarm calls</description>
 	<info>https://github.com/JoelLinn/alarmdialer</info>
 	<changelog>
+		 *0.3* Limit to only one concurrent call file
 		 *0.2* Cancel before playback and wait longer until new call
 		 *0.1* First fork and modification of Wake Up Calls Module
 	</changelog>
